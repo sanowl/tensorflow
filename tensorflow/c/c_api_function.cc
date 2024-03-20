@@ -121,7 +121,7 @@ Status ComputeBodyNodes(
       const auto& iter = input_nodes.find(node);
       if (iter == input_nodes.end()) {
         // This node is not referenced in inputs. Add it to the body.
-        body_nodes->push_back(node);
+        body_nodes->push_back(node);  
       } else {
         // This node is referenced in inputs. Currently, we place an
         // artificial restriction and require that when num_opers=-1, such
