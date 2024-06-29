@@ -15,7 +15,6 @@
 """Tests for remote execution."""
 
 import os
-import random
 import time
 
 from absl.testing import parameterized
@@ -49,6 +48,7 @@ from tensorflow.python.ops import while_loop
 from tensorflow.python.training import server_lib
 from tensorflow.python.training.server_lib import ClusterSpec
 from tensorflow.python.util import compat
+import secrets
 
 
 class SingleWorkerTest(test.TestCase, parameterized.TestCase):
@@ -123,7 +123,7 @@ class SingleWorkerTest(test.TestCase, parameterized.TestCase):
         y = x + y
         # Ask for y's shape after every 10 additions on average.
         # This exercises waiting for remote shape logic in TensorHandle.
-        if random.randint(1, 10) == 1:
+        if secrets.SystemRandom().randint(1, 10) == 1:
           _ = y.shape
     np.testing.assert_array_equal(
         [[num_iters, num_iters], [num_iters, num_iters]], y.numpy())

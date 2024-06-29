@@ -14,7 +14,6 @@
 # ==============================================================================
 """Tests for PreemptionCheckpointHandler."""
 import os
-import random
 import re
 import signal
 import sys
@@ -47,6 +46,7 @@ from tensorflow.python.platform import gfile
 from tensorflow.python.platform import test
 from tensorflow.python.platform import tf_logging as logging
 from tensorflow.python.training import server_lib
+import secrets
 
 
 try:
@@ -120,7 +120,7 @@ class PreemptionCheckpointTest(test.TestCase, parameterized.TestCase):
       if trigger_it:
         logging.info('Set preemption signal')
         clear_events[0].set()
-      elif random.randrange(0, 9) > 6:
+      elif secrets.SystemRandom().randrange(0, 9) > 6:
         clear_events[0].set()
 
   def worker_fn(self,
@@ -300,7 +300,7 @@ class PreemptionCheckpointTest(test.TestCase, parameterized.TestCase):
         time.sleep(1)
 
       logging.info('sending sigterm')
-      killed_worker = random.randrange(0, CLUSTER_SIZE)
+      killed_worker = secrets.SystemRandom().randrange(0, CLUSTER_SIZE)
       os.kill(mpr.get_process_id('worker', killed_worker), signal.SIGTERM)
 
       logging.info('sigterm sent')
@@ -355,7 +355,7 @@ class PreemptionCheckpointTest(test.TestCase, parameterized.TestCase):
                        training_finished)
 
   def test_error_propagation(self):
-    error_worker = random.randint(0, CLUSTER_SIZE)
+    error_worker = secrets.SystemRandom().randint(0, CLUSTER_SIZE)
     cluster_spec = multi_worker_test_base.create_cluster_spec(
         has_chief=False, num_workers=CLUSTER_SIZE)
     checkpoint_dir = self.get_temp_dir()
@@ -434,7 +434,7 @@ class PreemptionCheckpointTest(test.TestCase, parameterized.TestCase):
       while not training_started_event.is_set():
         time.sleep(1)
 
-      killed_worker = random.randrange(0, CLUSTER_SIZE)
+      killed_worker = secrets.SystemRandom().randrange(0, CLUSTER_SIZE)
       logging.info('sending SIGTERM')
       os.kill(mpr.get_process_id('worker', killed_worker), signal.SIGTERM)
       logging.info('SIGTERM sent')
@@ -527,7 +527,7 @@ class PreemptionCheckpointTest(test.TestCase, parameterized.TestCase):
     while not training_started_event.is_set():
       time.sleep(1)
 
-    killed_worker = random.randrange(0, CLUSTER_SIZE)
+    killed_worker = secrets.SystemRandom().randrange(0, CLUSTER_SIZE)
     logging.info('sending SIGTERM')
     os.kill(mpr.get_process_id('worker', killed_worker), signal.SIGTERM)
     logging.info('SIGTERM sent')

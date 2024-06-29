@@ -16,7 +16,6 @@
 """Tests for ProtoSplitter."""
 
 import os
-import random
 import string
 
 import riegeli
@@ -25,6 +24,7 @@ from tensorflow.python.platform import test
 from tensorflow.tools.proto_splitter import chunk_pb2
 from tensorflow.tools.proto_splitter import split
 from tensorflow.tools.proto_splitter.testdata import test_message_pb2
+import secrets
 
 
 class RepeatedStringSplitter(split.ComposableSplitter):
@@ -46,7 +46,7 @@ class RepeatedStringSplitter(split.ComposableSplitter):
 
 def _random_string(length):
   return bytes(
-      "".join(random.choices(string.ascii_lowercase, k=length)),
+      "".join(secrets.SystemRandom().choices(string.ascii_lowercase, k=length)),
       encoding="utf-8",
   )
 

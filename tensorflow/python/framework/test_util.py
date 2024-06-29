@@ -25,7 +25,6 @@ import gc
 import itertools
 import math
 import os
-import random
 import re
 import tempfile
 import threading
@@ -102,6 +101,7 @@ from tensorflow.python.util import traceback_utils
 from tensorflow.python.util.compat import collections_abc
 from tensorflow.python.util.protobuf import compare
 from tensorflow.python.util.tf_export import tf_export
+import secrets
 
 
 _F = TypeVar("_F", bound=Callable[..., Any])
@@ -2598,7 +2598,7 @@ class TensorFlowTestCase(googletest.TestCase):
   def setUp(self):
     super().setUp()
     self._ClearCachedSession()
-    random.seed(random_seed.DEFAULT_GRAPH_SEED)
+    secrets.SystemRandom().seed(random_seed.DEFAULT_GRAPH_SEED)
     np.random.seed(random_seed.DEFAULT_GRAPH_SEED)
     # Note: The following line is necessary because some test methods may error
     # out from within nested graph contexts (e.g., via assertRaises and

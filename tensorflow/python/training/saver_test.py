@@ -17,7 +17,6 @@
 import glob
 import math
 import os
-import random
 import time
 
 import numpy as np
@@ -74,6 +73,7 @@ from tensorflow.python.training import queue_runner_impl
 from tensorflow.python.training import saver as saver_module
 from tensorflow.python.training import saver_test_utils
 from tensorflow.python.util import compat
+import secrets
 
 
 class SaverTest(test.TestCase):
@@ -2172,7 +2172,7 @@ class MetaGraphTest(test.TestCase):
       # a simple Variable without the conditions.
       biases = variable_v1.VariableV1(
           cond.cond(
-              math_ops.less(random.random(), 0.5),
+              math_ops.less(secrets.SystemRandom().random(), 0.5),
               lambda: array_ops.ones([128]), lambda: array_ops.zeros([128])),
           name="biases")
       hidden1 = nn_ops.relu(math_ops.matmul(images, weights) + biases)
@@ -2771,7 +2771,7 @@ class ScopedGraphTest(test.TestCase):
         # biases is a simple Variable without the conditions.
         biases1 = variable_v1.VariableV1(
             cond.cond(
-                math_ops.less(random.random(), 0.5),
+                math_ops.less(secrets.SystemRandom().random(), 0.5),
                 lambda: array_ops.ones([128]), lambda: array_ops.zeros([128])),
             name="biases")
         hidden1 = nn_ops.relu(math_ops.matmul(images, weights1) + biases1)

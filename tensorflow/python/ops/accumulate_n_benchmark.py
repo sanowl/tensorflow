@@ -13,8 +13,6 @@
 # limitations under the License.
 # ==============================================================================
 """Benchmark for accumulate_n() in math_ops."""
-
-import random
 import time
 
 
@@ -29,6 +27,7 @@ from tensorflow.python.ops import math_ops
 from tensorflow.python.ops import random_ops
 from tensorflow.python.ops import state_ops
 from tensorflow.python.platform import test
+import secrets
 
 
 class AccumulateNBenchmark(test.Benchmark):
@@ -68,7 +67,7 @@ class AccumulateNBenchmark(test.Benchmark):
 
   def _GenerateUnorderedInputs(self, size, n):
     inputs = [random_ops.random_uniform(shape=[size]) for _ in range(n)]
-    random.shuffle(inputs)
+    secrets.SystemRandom().shuffle(inputs)
     return inputs
 
   def _GenerateReplicatedInputs(self, size, n):
