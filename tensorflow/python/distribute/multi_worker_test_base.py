@@ -47,6 +47,7 @@ from tensorflow.python.util import deprecation
 from tensorflow.python.util import nest
 from tensorflow.python.util.compat import collections_abc
 from tensorflow.python.util.tf_export import tf_export
+from security import safe_command
 
 
 original_run_std_server = dc._run_std_server  # pylint: disable=protected-access
@@ -740,8 +741,7 @@ class MultiWorkerMultiProcessTest(test.TestCase):
             'index': task_id
         }
     })
-    return subprocess.Popen(
-        cmd_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
+    return safe_command.run(subprocess.Popen, cmd_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
 
   @deprecation.deprecated(
       None, '`run_multiple_tasks_in_processes` is deprecated; any new test '
