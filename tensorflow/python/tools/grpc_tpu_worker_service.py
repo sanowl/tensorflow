@@ -65,10 +65,10 @@ def create_systemd_service_file(service_content, service_name):
 def move_file_to_systemd(service_name):
   if not os.path.exists("~/.config/systemd/user/"):
     mkdir_command = "mkdir -p ~/.config/systemd/user"
-    subprocess.run(mkdir_command, shell=True, check=True)
+    subprocess.run(mkdir_command, shell=False, check=True)
     print("Created directory ~/.config/systemd/user/")
   command = f"mv {service_name} ~/.config/systemd/user/{service_name}"
-  subprocess.run(command, shell=True, check=True)
+  subprocess.run(command, shell=False, check=True)
   print(f"Service file moved to ~/.config/systemd/user/{service_name}")
 
 
@@ -80,7 +80,7 @@ def enable_start_service(service_name):
       f"systemctl --user start {service_name}",
   ]
   for command in commands:
-    subprocess.run(command, shell=True, check=True)
+    subprocess.run(command, shell=False, check=True)
     print(f"Executed: {command}")
 
 
