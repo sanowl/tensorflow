@@ -13,8 +13,6 @@
 # limitations under the License.
 # ==============================================================================
 """Tests for tensorflow.ops.data_flow_ops.Queue."""
-
-import random
 import time
 
 import numpy as np
@@ -29,6 +27,7 @@ from tensorflow.python.framework import test_util
 from tensorflow.python.ops import data_flow_ops
 from tensorflow.python.platform import test
 from tensorflow.python.platform import tf_logging
+import secrets
 
 
 @test_util.run_v1_only("RandomShuffleQueue removed from v2")
@@ -501,7 +500,7 @@ class RandomShuffleQueueTest(test.TestCase):
 
   def testParallelDequeueUpToRandomPartition(self):
     with self.cached_session() as sess:
-      dequeue_sizes = [random.randint(50, 150) for _ in range(10)]
+      dequeue_sizes = [secrets.SystemRandom().randint(50, 150) for _ in range(10)]
       total_elements = sum(dequeue_sizes)
       q = data_flow_ops.RandomShuffleQueue(
           total_elements, 0, dtypes_lib.float32, shapes=())
@@ -584,13 +583,13 @@ class RandomShuffleQueueTest(test.TestCase):
   def testDequeueManyWithTensorParameter(self):
     with self.cached_session():
       # Define a first queue that contains integer counts.
-      dequeue_counts = [random.randint(1, 10) for _ in range(100)]
+      dequeue_counts = [secrets.SystemRandom().randint(1, 10) for _ in range(100)]
       count_q = data_flow_ops.RandomShuffleQueue(100, 0, dtypes_lib.int32)
       enqueue_counts_op = count_q.enqueue_many((dequeue_counts,))
       total_count = sum(dequeue_counts)
 
       # Define a second queue that contains total_count elements.
-      elems = [random.randint(0, 100) for _ in range(total_count)]
+      elems = [secrets.SystemRandom().randint(0, 100) for _ in range(total_count)]
       q = data_flow_ops.RandomShuffleQueue(total_count, 0, dtypes_lib.int32, (
           (),))
       enqueue_elems_op = q.enqueue_many((elems,))
@@ -610,13 +609,13 @@ class RandomShuffleQueueTest(test.TestCase):
   def testDequeueUpToWithTensorParameter(self):
     with self.cached_session():
       # Define a first queue that contains integer counts.
-      dequeue_counts = [random.randint(1, 10) for _ in range(100)]
+      dequeue_counts = [secrets.SystemRandom().randint(1, 10) for _ in range(100)]
       count_q = data_flow_ops.RandomShuffleQueue(100, 0, dtypes_lib.int32)
       enqueue_counts_op = count_q.enqueue_many((dequeue_counts,))
       total_count = sum(dequeue_counts)
 
       # Define a second queue that contains total_count elements.
-      elems = [random.randint(0, 100) for _ in range(total_count)]
+      elems = [secrets.SystemRandom().randint(0, 100) for _ in range(total_count)]
       q = data_flow_ops.RandomShuffleQueue(total_count, 0, dtypes_lib.int32, (
           (),))
       enqueue_elems_op = q.enqueue_many((elems,))

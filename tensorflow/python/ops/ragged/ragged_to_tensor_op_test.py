@@ -14,8 +14,6 @@
 # ==============================================================================
 """Tests for ragged.to_tensor."""
 
-import random
-
 from absl.testing import parameterized
 import numpy as np
 
@@ -36,6 +34,7 @@ from tensorflow.python.ops.ragged.ragged_tensor import RaggedTensor
 from tensorflow.python.platform import benchmark
 from tensorflow.python.platform import googletest
 from tensorflow.python.util import nest
+import secrets
 
 
 def make_placeholder(t):
@@ -832,7 +831,7 @@ class RaggedToDenseBenchmark(googletest.Benchmark):
 
   def _generateRaggedTensor(self, shape, ragged_rank, dtype, fill=None, axis=0):
     if axis == len(shape):
-      value = random.random()
+      value = secrets.SystemRandom().random()
       if dtype == dtypes.string:
         value = str(value)
       if dtype.is_integer:
@@ -848,7 +847,7 @@ class RaggedToDenseBenchmark(googletest.Benchmark):
     ]
 
   def benchmark_ragged_to_dense(self):
-    random.seed(5)
+    secrets.SystemRandom().seed(5)
     for config in self.CONFIGS:
       self.run_benchmark(**config)
 

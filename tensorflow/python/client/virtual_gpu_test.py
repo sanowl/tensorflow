@@ -14,8 +14,6 @@
 # ==============================================================================
 """Tests for multiple virtual GPU support."""
 
-import random
-
 import numpy as np
 
 from google.protobuf import text_format
@@ -29,6 +27,7 @@ from tensorflow.python.ops import random_ops
 from tensorflow.python.ops import variables
 from tensorflow.python.platform import test
 from tensorflow.python.platform import tf_logging as logging
+import secrets
 
 
 class VirtualGpuTestUtil(object):
@@ -99,7 +98,7 @@ class VirtualGpuTestUtil(object):
     for unused_i in range(self._num_ops):
       op_device = ()
       for unused_j in range(3):
-        random_num = random.random()
+        random_num = secrets.SystemRandom().random()
         for device_index in range(self._num_devices):
           if self._device_probabilities[device_index] > random_num:
             op_device += (device_index,)
@@ -159,7 +158,7 @@ class VirtualGpuTestUtil(object):
     else:
       debug_mode = True
     if random_seed is None:
-      random_seed = random.randint(0, 1 << 31)
+      random_seed = secrets.SystemRandom().randint(0, 1 << 31)
     else:
       debug_mode = True
     logging.info('Virtual gpu functional test for random graph...')

@@ -14,7 +14,6 @@
 # ==============================================================================
 """Tests for GCE specifics of PreemptionCheckpointHandler."""
 import os
-import random
 import re
 import sys
 import threading
@@ -45,6 +44,7 @@ from tensorflow.python.platform import gfile
 from tensorflow.python.platform import test
 from tensorflow.python.platform import tf_logging as logging
 from tensorflow.python.training import server_lib
+import secrets
 
 
 try:
@@ -137,7 +137,7 @@ class GceFailureHandlingTest(test.TestCase, parameterized.TestCase):
       del args, kwargs
       if not frequent_send:
         time.sleep(1)
-        if (not maintenance_event.is_set()) and (random.randrange(0, 7) == 5):
+        if (not maintenance_event.is_set()) and (secrets.SystemRandom().randrange(0, 7) == 5):
           maintenance_event.set()
           logging.info('Termination notice available.')
           return True
