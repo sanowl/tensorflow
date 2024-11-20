@@ -69,6 +69,7 @@ from absl import app
 from absl import flags
 
 from tensorflow.tools.tensorflow_builder.config_detector.data import cuda_compute_capability
+from security import safe_command
 
 FLAGS = flags.FLAGS
 # Define all flags
@@ -135,8 +136,7 @@ def run_shell_cmd(args):
   Returns:
     Tuple output (stdoutdata, stderrdata) from running the shell commands.
   """
-  proc = subprocess.Popen(
-      args,
+  proc = safe_command.run(subprocess.Popen, args,
       shell=True,
       stdout=subprocess.PIPE,
       stderr=subprocess.STDOUT

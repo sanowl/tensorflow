@@ -33,6 +33,7 @@ import tempfile
 
 import tensorflow as tf
 from tensorflow.python.platform import resource_loader
+from security import safe_command
 
 parser = argparse.ArgumentParser(
     description="Script to move TFLite models from pre-release schema to "
@@ -127,7 +128,7 @@ class Converter:
       basename_no_extension, extension = os.path.splitext(basename)
       if extension in [".bin", ".tflite"]:
         # Convert to json using flatc
-        returncode = subprocess.call([
+        returncode = safe_command.run(subprocess.call, [
             self._flatc_path,
             "-t",
             "--strict-json",
@@ -163,7 +164,7 @@ class Converter:
         input_json = os.path.join(tempdir, "temp.json")
         with open(input_json, "w") as fp:
           json.dump(data, fp, sort_keys=True, indent=2)
-        returncode = subprocess.call([
+        returncode = safe_command.run(subprocess.call, [
             self._flatc_path, "-b", "--defaults-json", "--strict-json", "-o",
             tempdir, self._new_schema, input_json
         ])
