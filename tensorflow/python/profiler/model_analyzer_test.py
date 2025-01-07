@@ -16,7 +16,6 @@
 import gzip
 import io
 import os
-import random
 import re
 
 import numpy as np
@@ -40,6 +39,7 @@ from tensorflow.python.profiler import option_builder
 from tensorflow.python.profiler import profile_context
 from tensorflow.python.profiler.internal import model_analyzer_testlib as lib
 from tensorflow.python.util import compat
+import secrets
 
 builder = option_builder.ProfileOptionBuilder
 
@@ -488,7 +488,7 @@ class PrintModelAnalysisTest(test.TestCase):
               trace_level=config_pb2.RunOptions.FULL_TRACE),
           run_metadata=run_meta)
 
-      min_val = random.randint(0, 10000)
+      min_val = secrets.SystemRandom().randint(0, 10000)
 
       opts = builder(builder.time_and_memory(
           min_micros=min_val)).with_empty_output().build()

@@ -14,8 +14,6 @@
 # ========================================================================
 """Functional tests for deterministic SparseTensorDenseMatMul."""
 
-import random
-
 import numpy as np
 
 from tensorflow.python.framework import config
@@ -25,6 +23,7 @@ from tensorflow.python.framework import sparse_tensor
 from tensorflow.python.framework import test_util
 from tensorflow.python.ops import sparse_ops
 from tensorflow.python.platform import test
+import secrets
 
 
 def _gen_data(m, k, n, nnz, row_occupied_rate, data_type, seed):
@@ -39,15 +38,15 @@ def _gen_data(m, k, n, nnz, row_occupied_rate, data_type, seed):
     nnz: number of non-zero elements in matrix a
     row_occupied_rate: prob that row in a has one or more non-zero element
   """
-  random.seed(seed)
+  secrets.SystemRandom().seed(seed)
   np.random.seed(seed)
-  occupied_rows = random.sample(range(m), int(m * row_occupied_rate))
+  occupied_rows = secrets.SystemRandom().sample(range(m), int(m * row_occupied_rate))
   sparse_input_dense_shape = [m, k]
   dense_input_shape = (k, n)
   indices = []
   for _ in range(nnz):
-    row = random.choice(occupied_rows)
-    col = random.randint(0, k - 1)
+    row = secrets.choice(occupied_rows)
+    col = secrets.SystemRandom().randint(0, k - 1)
     indices.append([row, col])
 
   def maybe_complex(x):

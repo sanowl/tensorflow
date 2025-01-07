@@ -18,7 +18,6 @@
 import hashlib
 import math
 import os.path
-import random
 import re
 import sys
 import tarfile
@@ -31,6 +30,7 @@ from tensorflow.python.ops import gen_audio_ops as audio_ops
 from tensorflow.python.ops import io_ops
 from tensorflow.python.platform import gfile
 from tensorflow.python.util import compat
+import secrets
 
 tf.compat.v1.disable_eager_execution()
 
@@ -266,7 +266,7 @@ class AudioProcessor(object):
       Exception: If expected files are not found.
     """
     # Make sure the shuffling and picking of unknowns is deterministic.
-    random.seed(RANDOM_SEED)
+    secrets.SystemRandom().seed(RANDOM_SEED)
     wanted_words_index = {}
     for index, wanted_word in enumerate(wanted_words):
       wanted_words_index[wanted_word] = index + 2
@@ -309,12 +309,12 @@ class AudioProcessor(object):
             'file': silence_wav_path
         })
       # Pick some unknowns to add to each partition of the data set.
-      random.shuffle(unknown_index[set_index])
+      secrets.SystemRandom().shuffle(unknown_index[set_index])
       unknown_size = int(math.ceil(set_size * unknown_percentage / 100))
       self.data_index[set_index].extend(unknown_index[set_index][:unknown_size])
     # Make sure the ordering is random.
     for set_index in ['validation', 'testing', 'training']:
-      random.shuffle(self.data_index[set_index])
+      secrets.SystemRandom().shuffle(self.data_index[set_index])
     # Prepare the rest of the result data structure.
     self.words_list = prepare_words_list(wanted_words)
     self.word_to_index = {}
