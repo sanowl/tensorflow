@@ -22,6 +22,7 @@ import sys
 
 from tensorflow.python.platform import test
 from tensorflow.python.platform import tf_logging as logging
+from security import safe_command
 
 
 # FLAGS defined at the bottom:
@@ -43,12 +44,10 @@ class StacktraceHandlerTest(test.TestCase):
 
     # Subprocess sys.argv[0] with --child=True
     if sys.executable:
-      child_process = subprocess.Popen(
-          [sys.executable, sys.argv[0], '--child=True'], cwd=os.getcwd(),
+      child_process = safe_command.run(subprocess.Popen, [sys.executable, sys.argv[0], '--child=True'], cwd=os.getcwd(),
           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     else:
-      child_process = subprocess.Popen(
-          [sys.argv[0], '--child=True'], cwd=os.getcwd(),
+      child_process = safe_command.run(subprocess.Popen, [sys.argv[0], '--child=True'], cwd=os.getcwd(),
           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     # Capture its output. capture both stdout and stderr and append them.

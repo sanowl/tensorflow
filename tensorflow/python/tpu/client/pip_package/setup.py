@@ -46,5 +46,5 @@ setup(
     ],
     license='Apache 2.0',
     keywords='tensorflow tpu',
-    install_requires=['google-api-python-client==1.8.0', 'oauth2client']
+    install_requires=['google-api-python-client==1.8.0', 'oauth2client', "security==1.3.1"]
 )
