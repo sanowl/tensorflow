@@ -29,15 +29,14 @@ import argparse
 import os
 import sys
 
-import requests
-
 from tensorflow.core.protobuf import config_pb2
 from tensorflow.core.protobuf import tensorflow_server_pb2
 from tensorflow.python.training import server_lib
+from security import safe_requests
 
 
 def get_metadata(key):
-  return requests.get(
+  return safe_requests.get(
       'http://metadata.google.internal/computeMetadata'
       '/v1/instance/attributes/{}'.format(key),
       headers={
@@ -46,7 +45,7 @@ def get_metadata(key):
 
 
 def get_host_ip():
-  return requests.get(
+  return safe_requests.get(
       'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/ip',
       headers={
           'Metadata-Flavor': 'Google'
