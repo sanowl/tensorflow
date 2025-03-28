@@ -222,7 +222,7 @@ class XxdOutputToBytesTest(test_util.TensorFlowTestCase):
     input_cc_file = os.path.join(tmp_dir, 'model.cc')
 
     command = 'xxd -i {} > {}'.format(model_filename, input_cc_file)
-    subprocess.call(command, shell=True)
+    subprocess.call(command, shell=False)
 
     # 4. VALIDATE
     final_bytes = flatbuffer_utils.xxd_output_to_bytes(input_cc_file)
