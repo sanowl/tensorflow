@@ -13,14 +13,13 @@
 # limitations under the License.
 # ==============================================================================
 """Tests for lock_util."""
-
-import random
 import time
 
 from absl.testing import parameterized
 
 from tensorflow.python.platform import test
 from tensorflow.python.util import lock_util
+import secrets
 
 
 class GroupLockTest(test.TestCase, parameterized.TestCase):
@@ -32,10 +31,10 @@ class GroupLockTest(test.TestCase, parameterized.TestCase):
     finished = set()
 
     def thread_fn(thread_id):
-      time.sleep(random.random() * 0.1)
+      time.sleep(secrets.SystemRandom().random() * 0.1)
       group_id = thread_id % num_groups
       with lock.group(group_id):
-        time.sleep(random.random() * 0.1)
+        time.sleep(secrets.SystemRandom().random() * 0.1)
         self.assertGreater(lock._group_member_counts[group_id], 0)
         for g, c in enumerate(lock._group_member_counts):
           if g != group_id:

@@ -15,7 +15,6 @@
 """Tests for tensorflow.ops.data_flow_ops.FIFOQueue."""
 
 import gc
-import random
 import time
 
 import numpy as np
@@ -38,6 +37,7 @@ from tensorflow.python.ops import data_flow_ops
 from tensorflow.python.ops import gen_resource_variable_ops
 from tensorflow.python.platform import test
 from tensorflow.python.util import compat
+import secrets
 
 
 @test_util.run_all_in_graph_and_eager_modes
@@ -436,13 +436,13 @@ class UnconvertedFIFOQueueTests(test.TestCase):
   def testDequeueManyWithTensorParameter(self):
     with self.cached_session():
       # Define a first queue that contains integer counts.
-      dequeue_counts = [random.randint(1, 10) for _ in range(100)]
+      dequeue_counts = [secrets.SystemRandom().randint(1, 10) for _ in range(100)]
       count_q = data_flow_ops.FIFOQueue(100, dtypes_lib.int32, ())
       enqueue_counts_op = count_q.enqueue_many((dequeue_counts,))
       total_count = sum(dequeue_counts)
 
       # Define a second queue that contains total_count elements.
-      elems = [random.randint(0, 100) for _ in range(total_count)]
+      elems = [secrets.SystemRandom().randint(0, 100) for _ in range(total_count)]
       q = data_flow_ops.FIFOQueue(total_count, dtypes_lib.int32, ())
       enqueue_elems_op = q.enqueue_many((elems,))
 
@@ -1516,11 +1516,11 @@ class FIFOQueueParallelTests(test.TestCase):
       elements_enqueued = 0
       while elements_enqueued < 250:
         # With equal probability, run Enqueue or enqueue_many.
-        if random.random() > 0.5:
+        if secrets.SystemRandom().random() > 0.5:
           enqueue_op.run({enqueue_placeholder: elements_enqueued})
           elements_enqueued += 1
         else:
-          count = random.randint(0, min(20, 250 - elements_enqueued))
+          count = secrets.SystemRandom().randint(0, min(20, 250 - elements_enqueued))
           range_to_enqueue = np.arange(
               elements_enqueued, elements_enqueued + count, dtype=np.int32)
           enqueuemany_op.run({enqueuemany_placeholder: range_to_enqueue})
@@ -1547,11 +1547,11 @@ class FIFOQueueParallelTests(test.TestCase):
       elements_dequeued = 0
       while elements_dequeued < 250:
         # With equal probability, run Dequeue or dequeue_many.
-        if random.random() > 0.5:
+        if secrets.SystemRandom().random() > 0.5:
           self.assertEqual(elements_dequeued, self.evaluate(dequeued_t))
           elements_dequeued += 1
         else:
-          count = random.randint(0, min(20, 250 - elements_dequeued))
+          count = secrets.SystemRandom().randint(0, min(20, 250 - elements_dequeued))
           expected_range = np.arange(
               elements_dequeued, elements_dequeued + count, dtype=np.int32)
           self.assertAllEqual(expected_range,

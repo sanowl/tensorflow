@@ -21,7 +21,6 @@ import csv
 import itertools
 import logging
 import os
-import random
 import sys
 import time
 import typing
@@ -39,6 +38,7 @@ import numpy as np
 import torch
 import tqdm
 from tqdm.contrib.logging import logging_redirect_tqdm
+import secrets
 
 LOG = logging.getLogger(__name__)
 
@@ -162,7 +162,7 @@ def generate_samples() -> typing.List[MatmulSize]:
   k_axis = np.unique(np.logspace(4, 13, num=200, dtype=np.int64, base=2))
   quants = [QuantizedInputType.BFLOAT16, QuantizedInputType.INT8]
   prod = itertools.product(m_axis, n_axis, k_axis, quants[1], quants[0])
-  out = random.choices((MatmulSize(*p) for p in prod), k=_NUM_SAMPLES.value)
+  out = secrets.SystemRandom().choices((MatmulSize(*p) for p in prod), k=_NUM_SAMPLES.value)
   return out
 
 
@@ -234,6 +234,6 @@ def main() -> None:
 
 
 if __name__ == '__main__':
-  random.seed(42)
+  secrets.SystemRandom().seed(42)
   app.parse_flags_with_usage(sys.argv)
   main()

@@ -13,7 +13,6 @@
 # limitations under the License.
 # ==============================================================================
 """Tests for `tf.data.Dataset.bucket_by_sequence_length()."""
-import random
 
 from absl.testing import parameterized
 
@@ -27,6 +26,7 @@ from tensorflow.python.framework import sparse_tensor
 from tensorflow.python.framework import tensor_shape
 from tensorflow.python.ops import array_ops
 from tensorflow.python.platform import test
+import secrets
 
 
 def _element_length_fn(x, y=None):
@@ -121,7 +121,7 @@ class BucketBySequenceLengthTest(test_base.DatasetTestBase,
           record_len = length
           for _ in range(bucket_elements):
             elements.append([1] * record_len)
-        random.shuffle(elements)
+        secrets.SystemRandom().shuffle(elements)
         for el in elements:
           yield (_format_record(el, sparse),)
 
@@ -219,7 +219,7 @@ class BucketBySequenceLengthTest(test_base.DatasetTestBase,
           for _ in range(batch_size):
             elements.append([1] * record_len)
             record_len = length
-        random.shuffle(elements)
+        secrets.SystemRandom().shuffle(elements)
         for el in elements:
           yield (_format_record(el, sparse),)
 
@@ -275,7 +275,7 @@ class BucketBySequenceLengthTest(test_base.DatasetTestBase,
       for batch_size, length in zip(batch_sizes[:-1], lengths):
         for _ in range(batch_size):
           elements.append([1] * length)
-      random.shuffle(elements)
+      secrets.SystemRandom().shuffle(elements)
       for el in elements:
         yield (el,)
       for _ in range(batch_sizes[-1]):

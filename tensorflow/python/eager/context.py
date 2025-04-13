@@ -20,7 +20,6 @@ import copy
 import gc
 import itertools
 import os
-import random
 import threading
 
 from absl import logging
@@ -47,6 +46,7 @@ from tensorflow.python.util import tf_contextlib
 from tensorflow.python.util.deprecation import deprecated
 from tensorflow.python.util.tf_export import tf_export
 from tsl.protobuf import coordination_config_pb2
+import secrets
 
 
 # TODO(b/307794935): Remove after a solution is found.
@@ -558,10 +558,10 @@ class Context:
     # to int.
     try:
       hash(seed)
-      self._rng = random.Random(seed)
+      self._rng = secrets.SystemRandom().Random(seed)
     except TypeError:
       seed = int(np.array(seed))
-      self._rng = random.Random(seed)
+      self._rng = secrets.SystemRandom().Random(seed)
     # Also clear the kernel cache, to reset any existing seeds
     if self._context_handle is not None:
       pywrap_tfe.TFE_ContextClearCaches(self._context_handle)
