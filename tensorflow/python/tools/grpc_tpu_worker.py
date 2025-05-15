@@ -42,7 +42,7 @@ def get_metadata(key):
       '/v1/instance/attributes/{}'.format(key),
       headers={
           'Metadata-Flavor': 'Google'
-      }).text
+      }, timeout=60).text
 
 
 def get_host_ip():
@@ -50,7 +50,7 @@ def get_host_ip():
       'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/ip',
       headers={
           'Metadata-Flavor': 'Google'
-      }).text
+      }, timeout=60).text
 
 
 def setup_env_vars():

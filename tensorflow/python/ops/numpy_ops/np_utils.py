@@ -352,7 +352,7 @@ def _add_np_doc(doc, np_fun_name, np_f, link):
         # Imports locally because some builds may not have `requests`
         import requests  # pylint: disable=g-import-not-at-top
 
-        r = requests.head(url)
+        r = requests.head(url, timeout=60)
         if r.status_code != 200:
           raise ValueError(
               f'Check link failed at [{url}] with status code {r.status_code}. '
