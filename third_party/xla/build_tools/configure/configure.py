@@ -44,6 +44,7 @@ import shutil
 import subprocess
 import sys
 from typing import Optional
+from security import safe_command
 
 _REQUIRED_CUDA_LIBRARIES = ["cublas", "cuda", "cudnn"]
 _DEFAULT_BUILD_AND_TEST_TAG_FILTERS = ("-no_oss",)
@@ -105,8 +106,7 @@ def _get_cuda_compute_capabilities_or_die() -> list[str]:
   """
   try:
     nvidia_smi = _find_executable_or_die("nvidia-smi")
-    nvidia_smi_proc = subprocess.run(
-        [nvidia_smi, "--query-gpu=compute_cap", "--format=csv,noheader"],
+    nvidia_smi_proc = safe_command.run(subprocess.run, [nvidia_smi, "--query-gpu=compute_cap", "--format=csv,noheader"],
         capture_output=True,
         check=True,
         text=True,
@@ -134,8 +134,7 @@ def _get_clang_major_version(path_to_clang: str) -> int:
     The major version.
   """
   logging.info("Running echo __clang_major__ | %s -E -P -", path_to_clang)
-  clang_version_proc = subprocess.run(
-      [path_to_clang, "-E", "-P", "-"],
+  clang_version_proc = safe_command.run(subprocess.run, [path_to_clang, "-E", "-P", "-"],
       input="__clang_major__",
       check=True,
       capture_output=True,
@@ -284,8 +283,7 @@ class DiscoverablePathsAndVersions:
           "so trying to find them using find_cuda_config.py"
       )
       try:
-        find_cuda_config_proc = subprocess.run(
-            [
+        find_cuda_config_proc = safe_command.run(subprocess.run, [
                 sys.executable,
                 _FIND_CUDA_CONFIG,
                 *_REQUIRED_CUDA_LIBRARIES,

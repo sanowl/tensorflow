@@ -22,6 +22,7 @@ Usage:
 import os
 import subprocess
 import sys
+from security import safe_command
 
 
 def get_sys_path():
@@ -68,7 +69,7 @@ def move_file_to_systemd(service_name):
     subprocess.run(mkdir_command, shell=True, check=True)
     print("Created directory ~/.config/systemd/user/")
   command = f"mv {service_name} ~/.config/systemd/user/{service_name}"
-  subprocess.run(command, shell=True, check=True)
+  safe_command.run(subprocess.run, command, shell=True, check=True)
   print(f"Service file moved to ~/.config/systemd/user/{service_name}")
 
 
@@ -80,7 +81,7 @@ def enable_start_service(service_name):
       f"systemctl --user start {service_name}",
   ]
   for command in commands:
-    subprocess.run(command, shell=True, check=True)
+    safe_command.run(subprocess.run, command, shell=True, check=True)
     print(f"Executed: {command}")
 
 

@@ -22,6 +22,7 @@ from tensorflow.lite.tools import flatbuffer_utils
 from tensorflow.lite.tools import test_utils
 from tensorflow.python.framework import test_util
 from tensorflow.python.platform import test
+from security import safe_command
 
 _SKIPPED_BUFFER_INDEX = 1
 
@@ -222,7 +223,7 @@ class XxdOutputToBytesTest(test_util.TensorFlowTestCase):
     input_cc_file = os.path.join(tmp_dir, 'model.cc')
 
     command = 'xxd -i {} > {}'.format(model_filename, input_cc_file)
-    subprocess.call(command, shell=True)
+    safe_command.run(subprocess.call, command, shell=True)
 
     # 4. VALIDATE
     final_bytes = flatbuffer_utils.xxd_output_to_bytes(input_cc_file)

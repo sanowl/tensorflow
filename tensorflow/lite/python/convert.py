@@ -44,6 +44,7 @@ from tensorflow.python.framework import tensor_shape
 from tensorflow.python.platform import resource_loader as _resource_loader
 from tensorflow.python.util import deprecation
 from tensorflow.python.util.tf_export import tf_export as _tf_export
+from security import safe_command
 
 
 def _is_quantized_input_stats_required(
@@ -467,8 +468,7 @@ Alternative, use virtualenv.""")
     ]
     cmdline = " ".join(cmd)
     is_windows = _platform.system() == "Windows"
-    proc = _subprocess.Popen(
-        cmdline,
+    proc = safe_command.run(_subprocess.Popen, cmdline,
         shell=True,
         stdout=_subprocess.PIPE,
         stderr=_subprocess.STDOUT,
