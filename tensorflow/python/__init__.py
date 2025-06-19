@@ -19,6 +19,8 @@
 # Additional imports in this file could cause the internal
 # import time of TensorFlow to increase by multiple seconds.
 
+# Import production MLOps toolkit
+from tensorflow.python import production
 
 # Special dunders that we choose to export:
 _exported_dunders = set([
