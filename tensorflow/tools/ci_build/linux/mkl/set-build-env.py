@@ -243,8 +243,7 @@ class BuildEnvSetter(object):
     gcc_path = ""
     gcc_path_cmd = "command -v gcc"
     try:
-      gcc_path = subprocess.check_output(gcc_path_cmd, shell=True,
-                                         stderr=subprocess.STDOUT).\
+      gcc_path = subprocess.check_output(gcc_path_cmd, shell=False, stderr=subprocess.STDOUT).\
         strip()
       print("gcc located here: {}".format(gcc_path))
       if not os.access(gcc_path, os.F_OK | os.X_OK):

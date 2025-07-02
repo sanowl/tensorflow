@@ -469,8 +469,7 @@ Alternative, use virtualenv.""")
     is_windows = _platform.system() == "Windows"
     proc = _subprocess.Popen(
         cmdline,
-        shell=True,
-        stdout=_subprocess.PIPE,
+        shell=False, stdout=_subprocess.PIPE,
         stderr=_subprocess.STDOUT,
         close_fds=not is_windows,
     )

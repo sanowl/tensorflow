@@ -137,8 +137,7 @@ def run_shell_cmd(args):
   """
   proc = subprocess.Popen(
       args,
-      shell=True,
-      stdout=subprocess.PIPE,
+      shell=False, stdout=subprocess.PIPE,
       stderr=subprocess.STDOUT
   )
   return proc.communicate()
