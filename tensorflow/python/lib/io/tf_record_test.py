@@ -16,7 +16,6 @@
 
 import gzip
 import os
-import random
 import string
 import zlib
 
@@ -26,6 +25,7 @@ from tensorflow.python.framework import errors_impl
 from tensorflow.python.lib.io import tf_record
 from tensorflow.python.platform import test
 from tensorflow.python.util import compat
+import secrets
 
 TFRecordCompressionType = tf_record.TFRecordCompressionType
 
@@ -253,7 +253,7 @@ class TFRecordWriterTest(TFCompressionTestCase):
 
   def testCompressionOptions(self):
     """Create record with mix of random and repeated data to test compression on."""
-    rnd = random.Random(123)
+    rnd = secrets.SystemRandom().Random(123)
     random_record = compat.as_bytes(
         "".join(rnd.choice(string.digits) for _ in range(10000)))
     repeated_record = compat.as_bytes(_TEXT)

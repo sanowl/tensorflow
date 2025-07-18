@@ -13,7 +13,6 @@
 # limitations under the License.
 # ==============================================================================
 """Smoke test for reading records from GCS to TensorFlow."""
-import random
 import sys
 import time
 
@@ -21,6 +20,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.core.example import example_pb2
 from tensorflow.python.lib.io import file_io
+import secrets
 
 flags = tf.compat.v1.app.flags
 flags.DEFINE_string("gcs_bucket_url", "",
@@ -195,7 +195,7 @@ def main(argv):
 
   # Generate random tfrecord path name.
   input_path = FLAGS.gcs_bucket_url + "/"
-  input_path += "".join(random.choice("0123456789ABCDEF") for i in range(8))
+  input_path += "".join(secrets.choice("0123456789ABCDEF") for i in range(8))
   input_path += ".tfrecord"
   print("Using input path: %s" % input_path)
 

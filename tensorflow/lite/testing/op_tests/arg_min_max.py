@@ -13,12 +13,12 @@
 # limitations under the License.
 # ==============================================================================
 """Test configs for arg_min_max."""
-import random
 
 import tensorflow as tf
 from tensorflow.lite.testing.zip_test_utils import create_tensor_data
 from tensorflow.lite.testing.zip_test_utils import make_zip_of_tests
 from tensorflow.lite.testing.zip_test_utils import register_make_test_function
+import secrets
 
 
 @register_make_test_function()
@@ -60,7 +60,7 @@ def make_arg_min_max_tests(options):
         name="input",
         shape=parameters["input_shape"])
     if not parameters["is_last_axis"]:
-      axis = random.randint(0, max(len(parameters["input_shape"]) - 1, 0))
+      axis = secrets.SystemRandom().randint(0, max(len(parameters["input_shape"]) - 1, 0))
     else:
       axis = -1
     if parameters["is_arg_max"]:

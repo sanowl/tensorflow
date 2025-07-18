@@ -19,7 +19,6 @@ import contextlib
 import functools
 import itertools
 import math
-import random
 
 import numpy as np
 
@@ -49,6 +48,7 @@ from tensorflow.python.ops import script_ops
 from tensorflow.python.platform import tf_logging as logging
 from tensorflow.python.types import data as data_types
 from tensorflow.python.util import nest
+import secrets
 
 
 class DataAdapter(object, metaclass=abc.ABCMeta):
@@ -956,7 +956,7 @@ class KerasSequenceAdapter(GeneratorDataAdapter):
         if self._shuffle_sequence:
           # Match the shuffle convention in OrderedEnqueuer.
           order = list(order)
-          random.shuffle(order)
+          secrets.SystemRandom().shuffle(order)
 
         for i in order:
           yield x[i]

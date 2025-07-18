@@ -13,8 +13,6 @@
 # limitations under the License.
 # ==============================================================================
 """Tests for checkpoint sharding policies."""
-
-import random
 import re
 import string
 
@@ -40,6 +38,7 @@ from tensorflow.python.platform import gfile
 from tensorflow.python.training import server_lib
 from tensorflow.python.training.saving import saveable_object
 from tensorflow.python.training.saving import saveable_object_util
+import secrets
 
 
 class ShardingPoliciesTest(test.TestCase):
@@ -563,7 +562,7 @@ class ShardingPoliciesTest(test.TestCase):
   @test_util.run_in_graph_and_eager_modes
   def test_MaxShardSizePolicy_Strings(self):
     v_strings = [
-        "".join(random.choices(string.ascii_uppercase + string.digits, k=10))
+        "".join(secrets.SystemRandom().choices(string.ascii_uppercase + string.digits, k=10))
         for _ in range(4)]
 
     root = module.Module()
@@ -621,8 +620,7 @@ class ShardingPoliciesTest(test.TestCase):
 
   @test_util.run_in_graph_and_eager_modes
   def test_MaxShardSizePolicy_LargeScalar(self):
-    v_string = "".join(random.choices(
-        string.ascii_uppercase + string.digits, k=10)).encode("utf-8")
+    v_string = "".join(secrets.SystemRandom().choices(string.ascii_uppercase + string.digits, k=10)).encode("utf-8")
     root = module.Module()
     with ops.device("cpu:0"):
       v0 = resource_variable_ops.ResourceVariable(
@@ -771,8 +769,7 @@ class ShardingPoliciesTest(test.TestCase):
         self.evaluate(shards[1][sliced_v0_name][slice_spec]), [[6.0, 7.0, 8.0]])
 
   def test_MaxShardSizePolicy_TFFunction(self):
-    v_string = "".join(random.choices(
-        string.ascii_uppercase + string.digits, k=10)).encode("utf-8")
+    v_string = "".join(secrets.SystemRandom().choices(string.ascii_uppercase + string.digits, k=10)).encode("utf-8")
     root = module.Module()
     with ops.device("cpu:0"):
       v0 = resource_variable_ops.ResourceVariable(

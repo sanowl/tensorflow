@@ -15,7 +15,6 @@
 """Tests for tensorflow.ops.data_flow_ops.PriorityQueue."""
 
 import copy
-import random
 import threading
 
 import numpy as np
@@ -29,6 +28,7 @@ from tensorflow.python.ops import array_ops
 from tensorflow.python.ops import data_flow_ops
 import tensorflow.python.ops.nn_grad  # pylint: disable=unused-import
 from tensorflow.python.platform import test
+import secrets
 
 
 @test_util.run_v1_only("PriorityQueue removed from v2")
@@ -131,7 +131,7 @@ class PriorityQueueTest(test.TestCase):
           q.enqueue_many((values, values)) for values in enqueue_values
       ]
       shuffled_counts = copy.deepcopy(enqueue_counts)
-      random.shuffle(shuffled_counts)
+      secrets.SystemRandom().shuffle(shuffled_counts)
       dequeue_ops = [q.dequeue_many(count) for count in shuffled_counts]
       all_enqueued_values = np.hstack(enqueue_values)
 
@@ -184,7 +184,7 @@ class PriorityQueueTest(test.TestCase):
           q.enqueue_many((values, values)) for values in enqueue_values
       ]
       shuffled_counts = copy.deepcopy(enqueue_counts)
-      random.shuffle(shuffled_counts)
+      secrets.SystemRandom().shuffle(shuffled_counts)
       dequeue_ops = [q.dequeue_many(count) for count in shuffled_counts]
       all_enqueued_values = np.hstack(enqueue_values)
 

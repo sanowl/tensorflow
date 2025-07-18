@@ -16,7 +16,6 @@
 """
 import contextlib
 import os
-import random
 import sys
 import threading
 
@@ -28,6 +27,7 @@ from tensorflow.python.platform import gfile
 from tensorflow.python.profiler import model_analyzer
 from tensorflow.python.util import _pywrap_tfprof as print_mdl
 from tensorflow.python.util import compat
+import secrets
 
 WARMUP_STEPS = 10
 MAX_TRACED_STEPS = 100
@@ -175,7 +175,7 @@ class ProfileContext(object):
     else:
       self._dump_steps = set(dump_steps[:])
 
-    self._rng = random.Random(111)
+    self._rng = secrets.SystemRandom().Random(111)
     self._fetched = set()
     self._slow_path_steps = self._dump_steps | self._trace_steps
     self._trace_next_step = False

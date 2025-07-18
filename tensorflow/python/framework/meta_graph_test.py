@@ -16,7 +16,6 @@
 
 import math
 import os.path
-import random
 import shutil
 
 from tensorflow.core.framework import graph_pb2
@@ -44,6 +43,7 @@ from tensorflow.python.ops import while_loop
 from tensorflow.python.platform import gfile
 from tensorflow.python.platform import test
 from tensorflow.python.training import queue_runner_impl
+import secrets
 
 
 # pylint: disable=invalid-name
@@ -354,7 +354,7 @@ class ScopedMetaGraphTest(test.TestCase):
         # biases is a simple Variable without the conditions.
         biases1 = variables.Variable(
             cond.cond(
-                math_ops.less(random.random(), 0.5),
+                math_ops.less(secrets.SystemRandom().random(), 0.5),
                 lambda: array_ops.ones([128]), lambda: array_ops.zeros([128])),
             name="biases")
         hidden1 = nn_ops.relu(math_ops.matmul(images, weights1) + biases1)

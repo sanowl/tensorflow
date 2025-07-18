@@ -17,7 +17,6 @@
 import collections
 import copy
 import dataclasses
-import random
 import sys
 import threading
 import time
@@ -56,6 +55,7 @@ from tensorflow.python.ops import variables
 from tensorflow.python.ops.ragged import ragged_tensor
 from tensorflow.python.platform import googletest
 from tensorflow.python.util.protobuf import compare_test_pb2
+import secrets
 
 
 @dataclasses.dataclass
@@ -894,12 +894,12 @@ class TestUtilTest(test_util.TensorFlowTestCase, parameterized.TestCase):
     # TODO(skyewm): remove this when C API is permanently enabled.
     with context.eager_mode():
       self.setUp()
-      a = random.randint(1, 1000)
+      a = secrets.SystemRandom().randint(1, 1000)
       a_np_rand = np.random.rand(1)
       a_rand = random_ops.random_normal([1])
       # ensure that randomness in multiple testCases is deterministic.
       self.setUp()
-      b = random.randint(1, 1000)
+      b = secrets.SystemRandom().randint(1, 1000)
       b_np_rand = np.random.rand(1)
       b_rand = random_ops.random_normal([1])
       self.assertEqual(a, b)

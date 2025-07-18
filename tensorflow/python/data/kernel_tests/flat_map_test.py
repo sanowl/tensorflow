@@ -13,7 +13,6 @@
 # limitations under the License.
 # ==============================================================================
 """Tests for `tf.data.Dataset.flat_map()`."""
-import random
 
 from absl.testing import parameterized
 import numpy as np
@@ -39,6 +38,7 @@ from tensorflow.python.ops.ragged import ragged_conversion_ops
 from tensorflow.python.ops.ragged import ragged_tensor
 from tensorflow.python.platform import test
 from tensorflow.python.training import server_lib
+import secrets
 
 
 class FlatMapTest(test_base.DatasetTestBase, parameterized.TestCase):
@@ -94,16 +94,16 @@ class FlatMapTest(test_base.DatasetTestBase, parameterized.TestCase):
     with session.Session(server.target) as sess1:
       with session.Session(server.target) as sess2:
         for _ in range(3):
-          sess = random.choice([sess1, sess2])
+          sess = secrets.choice([sess1, sess2])
           sess.run(init_op)
           for row in repeats:
             for i in row:
               for _ in range(i):
-                sess = random.choice([sess1, sess2])
+                sess = secrets.choice([sess1, sess2])
                 self.assertEqual(i, sess.run(get_next))
 
         with self.assertRaises(errors.OutOfRangeError):
-          sess = random.choice([sess1, sess2])
+          sess = secrets.choice([sess1, sess2])
           sess.run(get_next)
 
   @combinations.generate(test_base.default_test_combinations())

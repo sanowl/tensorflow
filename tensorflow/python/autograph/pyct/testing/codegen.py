@@ -13,14 +13,13 @@
 # limitations under the License.
 # ==============================================================================
 """Random code generation for testing/fuzzing."""
-# pylint: disable=invalid-name
-import random
 import string
 
 import gast
 import numpy as np
 
 from tensorflow.python.autograph.pyct import templates
+import secrets
 
 
 class NodeSampler(object):
@@ -135,7 +134,7 @@ class CodeGenerator(object):
 
   def generate_Name(self, ctx=gast.Load()):
     variable_name = '_' + ''.join(
-        random.choice(string.ascii_lowercase) for _ in range(4))
+        secrets.choice(string.ascii_lowercase) for _ in range(4))
     return gast.Name(variable_name, ctx=ctx, annotation=None)
 
   def generate_BinOp(self):

@@ -15,7 +15,6 @@
 """Benchmark for split and grad of split."""
 
 import itertools
-import random
 import time
 
 from tensorflow.core.protobuf import config_pb2
@@ -26,6 +25,7 @@ from tensorflow.python.ops import control_flow_ops
 from tensorflow.python.ops import gradients_impl
 from tensorflow.python.ops import variables
 from tensorflow.python.platform import test
+import secrets
 
 
 def build_graph(device, input_shape, variable, num_inputs, axis, grad):
@@ -50,13 +50,13 @@ def build_graph(device, input_shape, variable, num_inputs, axis, grad):
         inputs = [
             array_ops.zeros([
                 input_shape[0],
-                random.randint(max(1, input_shape[1] - 5), input_shape[1] + 5)
+                secrets.SystemRandom().randint(max(1, input_shape[1] - 5), input_shape[1] + 5)
             ]) for _ in range(num_inputs)
         ]
       else:
         inputs = [
             array_ops.zeros([
-                random.randint(max(1, input_shape[0] - 5), input_shape[0] + 5),
+                secrets.SystemRandom().randint(max(1, input_shape[0] - 5), input_shape[0] + 5),
                 input_shape[1]
             ]) for _ in range(num_inputs)
         ]

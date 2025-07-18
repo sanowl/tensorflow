@@ -15,7 +15,6 @@
 """Tests for tensorflow.python.framework.importer."""
 import json
 import os
-import random
 
 import numpy as np
 
@@ -26,6 +25,7 @@ from tensorflow.python.ops import array_ops
 from tensorflow.python.platform import benchmark
 from tensorflow.python.platform import gfile
 from tensorflow.python.platform import test
+import secrets
 
 # Used by SomeRandomBenchmark class below.
 _ran_somebenchmark_1 = [False]
@@ -132,7 +132,7 @@ class BenchmarkTest(test.TestCase):
         raise e
 
     prefix = os.path.join(tempdir,
-                          "reporting_bench_%016x_" % random.getrandbits(64))
+                          "reporting_bench_%016x_" % secrets.SystemRandom().getrandbits(64))
     expected_output_file = "%s%s" % (prefix,
                                      "TestReportingBenchmark.benchmarkReport1")
     expected_output_file_2 = "%s%s" % (

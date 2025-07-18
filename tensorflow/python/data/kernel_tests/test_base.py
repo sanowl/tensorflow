@@ -14,7 +14,6 @@
 # ==============================================================================
 """Test utilities for tf.data functionality."""
 import os
-import random
 import re
 
 from tensorflow.python.data.experimental.ops import lookup_ops as data_lookup_ops
@@ -38,6 +37,7 @@ from tensorflow.python.ops import lookup_ops
 from tensorflow.python.ops import tensor_array_ops
 from tensorflow.python.ops.ragged import ragged_tensor
 from tensorflow.python.platform import test
+import secrets
 
 
 def default_test_combinations():
@@ -320,7 +320,7 @@ class DatasetTestBase(test.TestCase):
     # Tests accessing the elements in a shuffled order with repeats.
     len_expected = len(expected)
     indices = list(range(len_expected)) * 2
-    random.shuffle(indices)
+    secrets.SystemRandom().shuffle(indices)
     for i in indices:
       self.assertAllEqual(expected[i],
                           self.evaluate(random_access.at(dataset, i)))

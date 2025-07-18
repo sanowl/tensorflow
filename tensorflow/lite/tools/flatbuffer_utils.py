@@ -21,7 +21,6 @@ tensorflow/lite/schema/schema.fbs
 """
 
 import copy
-import random
 import re
 import struct
 import sys
@@ -31,6 +30,7 @@ import flatbuffers
 from tensorflow.lite.python import schema_py_generated as schema_fb
 from tensorflow.lite.python import schema_util
 from tensorflow.python.platform import gfile
+import secrets
 
 _TFLITE_FILE_IDENTIFIER = b'TFL3'
 
@@ -160,7 +160,7 @@ def randomize_weights(model, random_seed=0, buffers_to_skip=None):
   """
 
   # The input to the random seed generator. The default value is 0.
-  random.seed(random_seed)
+  secrets.SystemRandom().seed(random_seed)
 
   # Parse model buffers which store the model weights
   buffers = model.buffers
@@ -193,11 +193,11 @@ def randomize_weights(model, random_seed=0, buffers_to_skip=None):
     if buffer_type.startswith('FLOAT'):
       format_code = 'e' if buffer_type == 'FLOAT16' else 'f'
       for offset in range(0, buffer_i_size, struct.calcsize(format_code)):
-        value = random.uniform(-0.5, 0.5)  # See http://b/152324470#comment2
+        value = secrets.SystemRandom().uniform(-0.5, 0.5)  # See http://b/152324470#comment2
         struct.pack_into(format_code, buffer_i_data, offset, value)
     else:
       for j in range(buffer_i_size):
-        buffer_i_data[j] = random.randint(0, 255)
+        buffer_i_data[j] = secrets.SystemRandom().randint(0, 255)
 
 
 def rename_custom_ops(model, map_custom_op_renames):
