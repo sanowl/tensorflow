@@ -1185,6 +1185,15 @@ int GetBuiltinOperatorVersion(const OpSignature& op_sig) {
       return 1;
 
     case BuiltinOperator_EXP:
+      if (op_sig.inputs.at(0).type == kTfLiteFloat16 ||
+          op_sig.inputs.at(0).type == kTfLiteBFloat16) {
+        return 3;
+      }
+      if (op_sig.inputs.at(0).type == kTfLiteInt8 ||
+          op_sig.inputs.at(0).type == kTfLiteInt16) {
+        return 2;
+      }
+      return 1;
     case BuiltinOperator_LOG:
     case BuiltinOperator_REDUCE_PROD:
     case BuiltinOperator_SQRT:

@@ -164,7 +164,7 @@ void BuiltinOpResolver::RegisterBuiltinOps() {
              /* max_version = */ 8);
   AddBuiltin(BuiltinOperator_EXP, Register_EXP(),
              /* min_version = */ 1,
-             /* max_version = */ 2);
+             /* max_version = */ 3);
   AddBuiltin(BuiltinOperator_TOPK_V2, Register_TOPK_V2(),
              /* min_version = */ 1,
              /* max_version = */ 3);

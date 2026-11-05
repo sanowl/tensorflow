@@ -1824,9 +1824,9 @@ def TFL_ExpOp: TFL_Op<"exp", [
     Performs element-wise natural exponentiation operation on input.
   }];
 
-  let arguments = (ins TFL_TensorOf<[F32, F16, QI8, QI16]>:$x);
+  let arguments = (ins TFL_TensorOf<[F32, F16, BF16, QI8, QI16]>:$x);
 
-  let results = (outs TFL_TensorOf<[F32, F16, QI8, QI16]>:$y);
+  let results = (outs TFL_TensorOf<[F32, F16, BF16, QI8, QI16]>:$y);
 
   let hasFolder = 1;
 

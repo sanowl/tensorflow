@@ -14,6 +14,7 @@ limitations under the License.
 ==============================================================================*/
 #include <math.h>
 
+#include <cmath>
 #include <initializer_list>
 #include <limits>
 #include <type_traits>
@@ -21,9 +22,11 @@ limitations under the License.
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include "Eigen/Core"  // from @eigen_archive
 #include "flatbuffers/flatbuffers.h"  // from @flatbuffers
 #include "tensorflow/lite/kernels/test_util.h"
 #include "tensorflow/lite/schema/schema_generated.h"
+#include "tensorflow/lite/types/half.h"
 
 namespace tflite {
 namespace {
@@ -101,6 +104,65 @@ TEST(ExpOpTest, ExpFloat) {
       ElementsAreArray(ArrayFloatNear(
           {std::exp(0.0f), std::exp(1.0f), std::exp(-1.0f), std::exp(100.0f),
            std::exp(-100.0f), std::exp(0.01f), std::exp(-0.01f)})));
+}
+
+template <typename T>
+class ReducedPrecisionExpOpModel : public BaseExpOpModel {
+ public:
+  using BaseExpOpModel::BaseExpOpModel;
+
+  void SetInput(std::initializer_list<float> data) {
+    PopulateTensor<T>(input_, data);
+  }
+
+  std::vector<float> GetOutputAsFloat() {
+    std::vector<float> result;
+    for (const T& value : ExtractVector<T>(output_)) {
+      result.push_back(static_cast<float>(value));
+    }
+    return result;
+  }
+};
+
+// All inputs below are exactly representable in fp16 and bf16, so the only
+// error is rounding the result. The tolerances cover half an ulp at e^2.
+TEST(ExpOpTest, ExpFloat16) {
+  ReducedPrecisionExpOpModel<half> m({TensorType_FLOAT16, {1, 1, 7}},
+                                     {TensorType_FLOAT16, {}});
+  m.SetInput({0.0f, 1.0f, -1.0f, 2.0f, -2.0f, 0.5f, -0.5f});
+  ASSERT_EQ(m.Invoke(), kTfLiteOk);
+  EXPECT_THAT(m.GetOutputShape(), ElementsAreArray({1, 1, 7}));
+  EXPECT_THAT(m.GetOutputAsFloat(),
+              ElementsAreArray(ArrayFloatNear(
+                  {std::exp(0.0f), std::exp(1.0f), std::exp(-1.0f),
+                   std::exp(2.0f), std::exp(-2.0f), std::exp(0.5f),
+                   std::exp(-0.5f)},
+                  /*max_abs_error=*/4e-3f)));
+}
+
+TEST(ExpOpTest, ExpFloat16OverflowsToInfinity) {
+  // The largest finite fp16 value is 65504, and e^12 is about 162755.
+  ReducedPrecisionExpOpModel<half> m({TensorType_FLOAT16, {2}},
+                                     {TensorType_FLOAT16, {}});
+  m.SetInput({12.0f, -20.0f});
+  ASSERT_EQ(m.Invoke(), kTfLiteOk);
+  const std::vector<float> output = m.GetOutputAsFloat();
+  EXPECT_TRUE(std::isinf(output[0]));
+  EXPECT_EQ(output[1], 0.0f);
+}
+
+TEST(ExpOpTest, ExpBFloat16) {
+  ReducedPrecisionExpOpModel<Eigen::bfloat16> m(
+      {TensorType_BFLOAT16, {1, 1, 7}}, {TensorType_BFLOAT16, {}});
+  m.SetInput({0.0f, 1.0f, -1.0f, 2.0f, -2.0f, 0.5f, -0.5f});
+  ASSERT_EQ(m.Invoke(), kTfLiteOk);
+  EXPECT_THAT(m.GetOutputShape(), ElementsAreArray({1, 1, 7}));
+  EXPECT_THAT(m.GetOutputAsFloat(),
+              ElementsAreArray(ArrayFloatNear(
+                  {std::exp(0.0f), std::exp(1.0f), std::exp(-1.0f),
+                   std::exp(2.0f), std::exp(-2.0f), std::exp(0.5f),
+                   std::exp(-0.5f)},
+                  /*max_abs_error=*/2e-2f)));
 }
 
 template <TensorType tensor_type, typename integer_dtype>

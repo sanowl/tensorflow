@@ -14,6 +14,7 @@ limitations under the License.
 ==============================================================================*/
 #include <cmath>
 
+#include "Eigen/Core"  // from @eigen_archive
 #include "tensorflow/lite/core/c/common.h"
 #include "tensorflow/lite/kernels/internal/common.h"
 #include "tensorflow/lite/kernels/internal/reference/integer_ops/lut.h"
@@ -92,13 +93,23 @@ TfLiteStatus Eval(TfLiteContext* context, TfLiteNode* node) {
   OpData* data = reinterpret_cast<OpData*>(node->user_data);
   ExpContext op_context(context, node);
 
-  // TODO(kanlig): supports half, bfloat16, float64, complex64, and complex128.
+  // TODO(kanlig): supports float64, complex64, and complex128.
   if (kernel_type == kReference) {
     switch (op_context.input->type) {
       case kTfLiteFloat32:
         reference_ops::Exp(GetTensorData<float>(op_context.input),
                            NumElements(op_context.input),
                            GetTensorData<float>(op_context.output));
+        break;
+      case kTfLiteFloat16:
+        reference_ops::Exp(GetTensorData<Eigen::half>(op_context.input),
+                           NumElements(op_context.input),
+                           GetTensorData<Eigen::half>(op_context.output));
+        break;
+      case kTfLiteBFloat16:
+        reference_ops::Exp(GetTensorData<Eigen::bfloat16>(op_context.input),
+                           NumElements(op_context.input),
+                           GetTensorData<Eigen::bfloat16>(op_context.output));
         break;
       case kTfLiteInt8:
         reference_integer_ops::LookupTable(
