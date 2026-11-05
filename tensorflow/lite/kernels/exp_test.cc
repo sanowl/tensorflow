@@ -17,6 +17,9 @@ limitations under the License.
 #include <cmath>
 #include <initializer_list>
 #include <limits>
+#include <map>
+#include <memory>
+#include <string>
 #include <type_traits>
 #include <vector>
 
@@ -29,17 +32,33 @@ limitations under the License.
 #include "tensorflow/lite/types/half.h"
 
 namespace tflite {
+
+namespace ops {
+namespace builtin {
+
+TfLiteRegistration* Register_EXP_REF();
+TfLiteRegistration* Register_EXP_GENERIC_OPT();
+
+}  // namespace builtin
+}  // namespace ops
+
 namespace {
 
 using ::testing::ElementsAreArray;
 
 class BaseExpOpModel : public SingleOpModel {
  public:
-  BaseExpOpModel(const TensorData& input, const TensorData& output) {
+  // With no registration, the default builtin Exp kernel is used.
+  BaseExpOpModel(const TensorData& input, const TensorData& output,
+                 TfLiteRegistration* registration = nullptr) {
     input_ = AddInput(input);
     output_ = AddOutput(output);
     SetBuiltinOp(BuiltinOperator_EXP, BuiltinOptions_ExpOptions,
                  CreateExpOptions(builder_).Union());
+    if (registration != nullptr) {
+      resolver_ =
+          std::make_unique<SingleOpResolver>(BuiltinOperator_EXP, registration);
+    }
     BuildInterpreter({GetShape(input_)});
   }
 
@@ -55,6 +74,9 @@ class FloatExpOpModel : public BaseExpOpModel {
   using BaseExpOpModel::BaseExpOpModel;
 
   void SetInput(std::initializer_list<float> data) {
+    PopulateTensor(input_, data);
+  }
+  void PopulateInput(const std::vector<float>& data) {
     PopulateTensor(input_, data);
   }
 
@@ -105,6 +127,63 @@ TEST(ExpOpTest, ExpFloat) {
           {std::exp(0.0f), std::exp(1.0f), std::exp(-1.0f), std::exp(100.0f),
            std::exp(-100.0f), std::exp(0.01f), std::exp(-0.01f)})));
 }
+
+const auto kExpKernelMap = new std::map<std::string, TfLiteRegistration*>({
+    {"Reference", ops::builtin::Register_EXP_REF()},
+    {"GenericOptimized", ops::builtin::Register_EXP_GENERIC_OPT()},
+});
+
+class ExpKernelTest : public SingleOpTest {
+ protected:
+  const std::map<std::string, TfLiteRegistration*>& GetKernelMap() override {
+    return *kExpKernelMap;
+  }
+};
+
+// Long enough to exercise both the vectorized body and the scalar tail of the
+// optimized kernel, and spans overflow, underflow and denormal results.
+TEST_P(ExpKernelTest, MatchesStdExpOverWideRange) {
+  constexpr int kSize = 1027;
+  FloatExpOpModel m({TensorType_FLOAT32, {kSize}}, {TensorType_FLOAT32, {}},
+                    GetRegistration());
+  std::vector<float> input(kSize);
+  for (int i = 0; i < kSize; ++i) {
+    input[i] = -110.0f + 200.0f * i / (kSize - 1);
+  }
+  m.PopulateInput(input);
+  ASSERT_EQ(m.Invoke(), kTfLiteOk);
+  const std::vector<float> output = m.GetOutput();
+  ASSERT_EQ(output.size(), kSize);
+  for (int i = 0; i < kSize; ++i) {
+    const float expected = std::exp(input[i]);
+    if (std::isinf(expected) || expected == 0.0f) {
+      EXPECT_EQ(output[i], expected) << "x = " << input[i];
+    } else {
+      // Two ulps of relative error, plus slack for denormal results.
+      EXPECT_NEAR(output[i], expected,
+                  2.4e-7f * expected + std::numeric_limits<float>::denorm_min())
+          << "x = " << input[i];
+    }
+  }
+}
+
+TEST_P(ExpKernelTest, SpecialValues) {
+  FloatExpOpModel m({TensorType_FLOAT32, {4}}, {TensorType_FLOAT32, {}},
+                    GetRegistration());
+  m.SetInput({std::numeric_limits<float>::infinity(),
+              -std::numeric_limits<float>::infinity(), 0.0f,
+              std::numeric_limits<float>::quiet_NaN()});
+  ASSERT_EQ(m.Invoke(), kTfLiteOk);
+  const std::vector<float> output = m.GetOutput();
+  EXPECT_TRUE(std::isinf(output[0]) && output[0] > 0);
+  EXPECT_EQ(output[1], 0.0f);
+  EXPECT_EQ(output[2], 1.0f);
+  EXPECT_TRUE(std::isnan(output[3]));
+}
+
+INSTANTIATE_TEST_SUITE_P(
+    ExpKernelTest, ExpKernelTest,
+    ::testing::ValuesIn(SingleOpTest::GetKernelTags(*kExpKernelMap)));
 
 template <typename T>
 class ReducedPrecisionExpOpModel : public BaseExpOpModel {

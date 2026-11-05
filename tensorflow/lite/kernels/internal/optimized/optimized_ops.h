@@ -4279,6 +4279,16 @@ inline void Ceil(const RuntimeShape& input_shape, const float* input_data,
   output_map.array() = Eigen::ceil(input_map.array());
 }
 
+// Vectorized through Eigen's pexp. It agrees with std::exp to within 1 ulp,
+// including inf, NaN, overflow to inf and gradual underflow to zero.
+inline void Exp(const float* input_data, const size_t num_elements,
+                float* output_data) {
+  ruy::profiler::ScopeLabel label("Exp");
+  const auto size = static_cast<Eigen::Index>(num_elements);
+  Eigen::Map<Eigen::ArrayXf>(output_data, size) =
+      Eigen::Map<const Eigen::ArrayXf>(input_data, size).exp();
+}
+
 // Helper methods for BatchToSpaceND.
 // `spatial_index_dim` specifies post-crop offset index in this spatial
 // dimension, i.e. spatial offset introduced by flattening batch to spatial
